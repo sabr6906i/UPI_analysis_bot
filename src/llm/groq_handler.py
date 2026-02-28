@@ -4,6 +4,7 @@ Manages interactions with Groq API for natural language generation
 """
 
 from typing import Dict, List, Optional
+import httpx
 from groq import Groq
 from loguru import logger
 import json
@@ -50,7 +51,12 @@ When explaining anomalies or patterns, reference these baseline metrics."""
         if not api_key:
             raise ValueError("Groq API key is required")
         
-        self.client = Groq(api_key=api_key)
+        
+        # Explicitly setting a client avoids the internal 'proxies' keyword conflict
+        self.client = Groq(
+            api_key=api_key,
+            http_client=httpx.Client()
+        )
         self.model = model
         self.temperature = temperature
         self.max_tokens = max_tokens
